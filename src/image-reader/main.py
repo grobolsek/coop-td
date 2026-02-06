@@ -7,7 +7,7 @@ import re
 import numpy as np
 
 
-img = cv2.imread('data/test6.png')
+img = cv2.imread('data/test4.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 center = img.shape[1] / 2
