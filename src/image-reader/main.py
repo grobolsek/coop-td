@@ -7,7 +7,7 @@ import re
 import numpy as np
 
 
-img = cv2.imread('data/test4.png')
+img = cv2.imread('data/test6.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 center = img.shape[1] / 2
@@ -27,19 +27,22 @@ for cnt in contours:
         candidats.append(cnt)
 
 
-def find_most_similar(data):
+def find_most_similar(data, n):
     data = sorted(data, key= lambda x: cv2.contourArea(x))
     min_diff = float('inf')
     best_start_idx = 0
     
-    for i in range(len(data) - 5):
-        current_diff = cv2.contourArea(data[i + 3]) - cv2.contourArea(data[i])
+    for i in range(len(data) - n + 1):
+        current_diff = cv2.contourArea(data[i + n - 1]) - cv2.contourArea(data[i])
         
         if current_diff < min_diff:
             min_diff = current_diff
             best_start_idx = i
             
-    return data[best_start_idx : best_start_idx + 4]
+    return data[best_start_idx : best_start_idx + n]
+
+
+clears = []
 
 for cnt in find_most_similar(candidats, 4):
     x, y, w, h = cv2.boundingRect(cnt)
@@ -75,5 +78,14 @@ for cnt in find_most_similar(candidats, 4):
     # 6. OCR
     text = pytesseract.image_to_string(roi, config='--psm 7')
     line = re.findall(r'[a-zA-Z0-9]+', text)
-    print(f"Detected: {line}")
+    res = []
+    for part in line:
+        if part.isdigit():
+            res.append(int(part))
+        elif len(part) > 1:
+            res.append(part)
+    
+    if len(res) == 3:
+        clears.append(res)
 
+print(clears)
